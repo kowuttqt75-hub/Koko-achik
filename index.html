@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday အချစ်လေး ကစ် 🎂❤️ - ဝှက်ထားတဲ့ကောင်းကင်</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Noto+Sans+Myanmar:wght@300;400;500;600;700&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Padauk', 'Noto Sans Myanmar', sans-serif;
+            background: linear-gradient(135deg, #1a0b2e 0%, #3b0764 40%, #701a75 70%, #4c0519 100%);
+            color: #fdf2f8;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 192, 203, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-card-glow {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(244, 114, 182, 0.4);
+            box-shadow: 0 0 30px rgba(244, 114, 182, 0.3);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.6)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 25px rgba(244, 114, 182, 0.9)); }
+        }
+        .pulse-heart {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        @keyframes flicker {
+            0%, 100% { transform: scale(1) rotate(-2deg); opacity: 0.95; }
+            25% { transform: scale(1.15) rotate(2deg); opacity: 1; }
+            50% { transform: scale(0.9) rotate(-1deg); opacity: 0.85; }
+            75% { transform: scale(1.1) rotate(1deg); opacity: 0.98; }
+        }
+        .flame {
+            animation: flicker 0.6s infinite alternate ease-in-out;
+            transform-origin: center bottom;
+        }
+
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 10, 40, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(244, 114, 182, 0.5);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-slate-100 pb-16">
+
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- HTML Audio Player for song.mp3 -->
+    <audio id="bgMusic" preload="auto" src="song.mp3"></audio>
+
+    <div class="content-layer max-w-4xl mx-auto px-4 py-8">
+        
+        <!-- Top Music Control Bar -->
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+            <div class="inline-flex items-center gap-2 bg-pink-950/60 border border-pink-500/30 px-4 py-2 rounded-full text-xs md:text-sm font-medium tracking-wide shadow-lg">
+                <span class="w-2.5 h-2.5 rounded-full bg-pink-400 animate-ping"></span>
+                <span>မွေးနေ့အထူးသီးသန့် မေတ္တာလွှာ 💌</span>
+            </div>
+
+            <!-- Music Play Control Button -->
+            <button id="musicBtn" onclick="toggleSong()" class="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 border border-pink-300/40 text-white px-5 py-2.5 rounded-full text-xs md:text-sm font-semibold flex items-center gap-2 transition-all shadow-xl active:scale-95 cursor-pointer">
+                <i id="musicIcon" class="fas fa-play text-xs"></i>
+                <span id="musicText">ဝှက်ထားတဲ့ကောင်းကင် ဖွင့်ရန် 🎵</span>
+            </button>
+        </div>
+
+        <!-- Music Player Container -->
+        <div id="playerContainer" class="mb-8 hidden">
+            <div class="glass-card-glow rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 border border-pink-400/40">
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <div class="w-14 h-14 rounded-xl bg-pink-900/60 border border-pink-400/30 flex items-center justify-center text-pink-300 text-2xl flex-shrink-0 shadow-inner">
+                        <i id="cdIcon" class="fas fa-compact-disc text-pink-400"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs px-2 py-0.5 rounded bg-pink-500/30 text-pink-200 font-mono">NOW PLAYING</span>
+                            <span class="text-xs text-pink-300/70">နောက်ခံတေးသီချင်း</span>
+                        </div>
+                        <h4 class="font-bold text-base text-pink-100">ဝှက်ထားတဲ့ကောင်းကင် ❤️</h4>
+                        <p class="text-xs text-pink-200/80 italic">"အချစ်လေး ကစ် အတွက် သီးသန့်မွေးနေ့တေး..."</p>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-auto flex items-center justify-center gap-3">
+                    <button onclick="pauseSong()" class="px-4 py-2 bg-pink-900/50 hover:bg-pink-800/60 border border-pink-500/30 rounded-xl text-xs font-medium text-pink-200 transition-all cursor-pointer">
+                        <i class="fas fa-pause mr-1"></i> ခဏရပ်မည်
+                    </button>
+                    <button onclick="playSong()" class="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-xl text-xs font-semibold shadow-md transition-all cursor-pointer">
+                        <i class="fas fa-play mr-1"></i> ဆက်ဖွင့်မည်
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <header class="text-center my-8 md:my-12">
+            <div class="inline-block relative mb-4">
+                <i class="fas fa-heart text-5xl md:text-7xl text-pink-500 pulse-heart"></i>
+                <i class="fas fa-crown absolute -top-4 -right-2 text-amber-300 text-2xl md:text-3xl transform rotate-12"></i>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-300 via-rose-200 to-purple-300 mb-3 leading-relaxed">
+                Happy Birthday, အချစ်လေးရေ 🎂❤️🎀
+            </h1>
+            <p class="text-pink-200/80 text-sm md:text-lg font-light tracking-wide">
+                ကိုကို့ရဲ့ မင်းသမီးလေး "ကစ်" အတွက် သီးသန့်ဖန်တီးထားသော အမှတ်တရ
+            </p>
+        </header>
+
+        <!-- Page 1: Cake & Candle Section -->
+        <section class="glass-card rounded-3xl p-6 md:p-8 mb-10 text-center relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <h2 class="text-xl md:text-2xl font-semibold text-pink-200 mb-6">
+                🎉 မွေးနေ့ဖယောင်းတိုင်လေး လေမှုတ်ပြီး ဆုတောင်းရအောင် ✨
+            </h2>
+
+            <!-- Interactive Cake SVG -->
+            <div class="relative w-48 h-48 mx-auto my-4 cursor-pointer group" onclick="blowCandles()">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-2xl">
+                    <ellipse cx="100" cy="170" rx="80" ry="18" fill="#4a154b" opacity="0.6"/>
+                    <rect x="35" y="115" width="130" height="45" rx="10" fill="#f472b6"/>
+                    <path d="M 35 125 Q 45 135 55 125 T 75 125 T 95 125 T 115 125 T 135 125 T 155 125 T 165 125 L 165 115 L 35 115 Z" fill="#fbcfe8"/>
+                    <rect x="50" y="75" width="100" height="42" rx="8" fill="#fb7185"/>
+                    <path d="M 50 85 Q 60 95 70 85 T 90 85 T 110 85 T 130 85 T 150 85 L 150 75 L 50 75 Z" fill="#ffffff"/>
+                    <!-- Candles -->
+                    <rect x="70" y="48" width="6" height="28" rx="2" fill="#fef08a"/>
+                    <rect x="100" y="42" width="6" height="34" rx="2" fill="#fef08a"/>
+                    <rect x="130" y="48" width="6" height="28" rx="2" fill="#fef08a"/>
+                    <!-- Flames -->
+                    <g id="candleFlames">
+                        <path class="flame" d="M 73 36 C 70 42, 76 45, 73 48 C 70 45, 76 42, 73 36 Z" fill="#fbbf24"/>
+                        <path class="flame" d="M 103 30 C 100 36, 106 39, 103 42 C 100 39, 106 36, 103 30 Z" fill="#f97316"/>
+                        <path class="flame" d="M 133 36 C 130 42, 136 45, 133 48 C 130 45, 136 42, 133 36 Z" fill="#fbbf24"/>
+                    </g>
+                </svg>
+            </div>
+            <p id="cakeInstruction" class="text-xs md:text-sm text-pink-300/80 italic mt-2">
+                (ကိတ်မုန့်လေးကို နှိပ်ပြီး ဖယောင်းတိုင် လေမှုတ်ပါနော် 🎂)
+            </p>
+        </section>
+
+        <!-- Page 2: Romantic Birthday Proposal Message -->
+        <section class="glass-card-glow rounded-3xl p-6 md:p-10 mb-10 text-left relative">
+            <div class="text-center mb-6">
+                <span class="text-3xl">💌</span>
+                <h3 class="text-2xl md:text-3xl font-bold text-pink-100 mt-2">ကိုကို့ရဲ့ ရင်ထဲက စကားလွှာ</h3>
+            </div>
+
+            <div class="space-y-4 text-sm md:text-base leading-relaxed text-pink-100/90 font-normal">
+                <p>
+                    ပထမဆုံးအနေနဲ့ ကိုယ့်အချစ်လေးရဲ့ဘဝမှာ ပျော်ရွှင်မှုတွေ၊ အချစ်တွေ၊ ကျန်းမာခြင်းတွေနဲ့ လှပတဲ့အခိုက်အတန့်တွေ အမြဲပြည့်နှက်နေပါစေလို့ ဆုတောင်းပေးပါတယ်။ အချစ်လေးကစ် ရဲ့ အိပ်မက်တွေနဲ့ လိုချင်တဲ့ဆန္ဒတွေအားလုံးလည်း တကယ်ဖြစ်လာပါစေနော်။ 🥺💗
+                </p>
+                <p>
+                    ကိုယ့်ဘဝထဲမှာ ကစ်လေးရှိနေပေးတဲ့အတွက် ကိုယ်အရမ်းကျေးဇူးတင်ပါတယ်။ ကစ်လေးက ကိုကိုးအတွက် တန်ဖိုးအရှိဆုံးလူတွေထဲက တစ်ယောက်ဖြစ်ပြီး ကစ်ကို နေ့တိုင်းပြုံးပျော်နေတာပဲ မြင်ချင်တယ်။ ကိုကိုးတို့နှစ်ယောက် အဝေးမှာရှိနေရပေမဲ့ ကိုယ့်နှလုံးသားက ကစ် နဲ့အတူ အမြဲရှိနေတယ်ဆိုတာ မမေ့ပါနဲ့နော်။ ကိုကိုသာ ကစ်အနားမှာရှိခွင့်ရမယ်ဆိုရင် ကစ် ကို ရင်ခွင်ထဲဖက်ထားပြီး ကစ်ရဲ့မွေးနေ့လေးကို ကစ် ကိုယ်တိုင်လိုပဲ အထူးခြားဆုံးဖြစ်အောင် လုပ်ပေးချင်တယ်💕
+                </p>
+                <p>
+                    ကိုကိုးကစ်ကို ဆက်ချစ်သွားမယ်၊ ဂရုစိုက်ပေးသွားမယ်၊ ကစ်လေးပျော်ရွှင်ဖို့လည်း အတတ်နိုင်ဆုံး ကြိုးစားသွားမယ်လို့ ကတိပေးပါတယ်။ ကိုကိုက ပြည့်စုံတဲ့လူတစ်ယောက် မဟုတ်မှန်းသိပေမဲ့ ကစ်လေးအပေါ်ထားတဲ့ ကိုယ့်အချစ်ကတော့ တကယ်စစ်မှန်ပြီး ရိုးသားပါတယ်။ နောင်လာမယ့် မွေးနေ့တွေအများကြီးကိုလည်း အတူတူကျင်းပခွင့်ရပြီး ဘယ်တော့မှမမေ့နိုင်မယ့် လှပတဲ့အမှတ်တရလေးတွေ အတူဖန်တီးသွားနိုင်ဖို့ ကိုကိုဆု‌‌ေတာင်းပါတယ်။ 🥹💍❤️
+                </p>
+                <p class="font-semibold text-pink-200">
+                    ကိုကို့ကောင်မလေးရေ ကိုယ့်ကိုယ်ကို အမြဲဂရုစိုက်နော်။ အမြဲပြုံးပျော်နေဖို့လည်း မမေ့ပါနဲ့။ ကစ် ရဲ့ပျော်ရွှင်မှုက ကိုယ့်အတွက် အရမ်းအရေးကြီးတယ်။ စကားလုံးတွေနဲ့တောင် ဖော်ပြလို့မကုန်နိုင်လောက်အောင် ကိုကိုကစ် ကို ချစ်တယ်။ ကစ် ရဲ့ဘဝမှာ ဘယ်လိုအချိန်မျိုးပဲ ကြုံလာပါစေ ကစ်ရဲ့ဘေးမှာ အမြဲရှိနေပေးနိုင်တဲ့သူတစ်ယောက် ကိုယ်ဖြစ်ချင်တယ် ကိုယ့်ရဲ့မင်းသမီးလေး၊ ကိုယ့်ရဲ့ Baby လေးနဲ့ ဒီကမ္ဘာပေါ်မှာ ကိုယ်အချစ်ဆုံးလူလေးရေ။ ဒီနေ့မှာလည်း ချစ်တယ်၊ မနက်ဖြန်မှာလည်း ချစ်နေဦးမယ်၊ နောင်လာမယ့် နေ့ရက်တိုင်းမှာလည်း အမြဲတမ်း ချစ်နေသွားမယ်နော်။ 🎂💋❤️‍🩹🫶🏻
+                </p>
+            </div>
+
+            <!-- Marriage Proposal Interactive Card -->
+            <div class="mt-8 pt-6 border-t border-pink-400/30 text-center">
+                <div class="inline-block p-6 rounded-2xl bg-gradient-to-r from-pink-900/60 to-purple-900/60 border border-pink-400/50 shadow-2xl">
+                    <p class="text-lg md:text-xl font-bold text-pink-200 mb-4">
+                        ကိုကိုးတို့နှစ်ယောက် လက်ထပ်ကြမယ်နော်ဗျ... 💍❤️
+                    </p>
+                    <p class="text-xs md:text-sm text-pink-300/80 mb-6">
+                        ကစ်လေး ကိုကိုးကို ယုံယုံကြည်ကြည်နဲ့ စောင့်နေမယ်ဆိုတာ ကိုကိုး ယုံကြည်တယ်ဗျ 💋♥️
+                    </p>
+                    <button onclick="sayYes()" class="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white font-bold px-8 py-3 rounded-full text-base shadow-lg shadow-pink-500/50 transform transition-all active:scale-95 animate-bounce cursor-pointer">
+                        လက်ခံပါတယ် ❤️ (Yes, I Do!)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-xs text-pink-300/60 mt-12">
+            Crafted with Endless Love for Kit ❤️ | Forever & Always
+        </footer>
+    </div>
+
+    <script>
+        // Audio Control Logic
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicText = document.getElementById('musicText');
+        const playerContainer = document.getElementById('playerContainer');
+        const cdIcon = document.getElementById('cdIcon');
+        let isPlaying = false;
+
+        function toggleSong() {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        }
+
+        function playSong() {
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                playerContainer.classList.remove('hidden');
+                musicIcon.className = "fas fa-pause text-xs";
+                musicText.innerText = "သီချင်းရပ်မည် 🎵";
+                cdIcon.classList.add('animate-spin');
+            }).catch(e => {
+                console.log("Audio playback error:", e);
+                alert("သီချင်းဖိုင် (song.mp3) ကို GitHub ထဲမှာ အမှန်တကယ် တင်ထားခြင်း ရှိမရှိ စစ်ဆေးပေးပါခင်ဗျာ။");
+            });
+        }
+
+        function pauseSong() {
+            bgMusic.pause();
+            isPlaying = false;
+            musicIcon.className = "fas fa-play text-xs";
+            musicText.innerText = "ဝှက်ထားတဲ့ကောင်းကင် ဖွင့်ရန် 🎵";
+            cdIcon.classList.remove('animate-spin');
+        }
+
+        // Blow Candles & Fire Confetti
+        function blowCandles() {
+            const flames = document.getElementById('candleFlames');
+            if (flames) {
+                flames.style.display = 'none';
+                document.getElementById('cakeInstruction').innerText = "✨ မွေးနေ့ဆုတောင်းများ အကုန်ပြည့်ဝပါစေနော်! ✨";
+            }
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+            if (!isPlaying) playSong();
+        }
+
+        // Say Yes Proposal Celebration
+        function sayYes() {
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              var particleCount = 50 * (timeLeft / duration);
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+
+            alert("ကိုကို့ကို လက်ခံပေးလို့ ကျေးဇူးပါ အချစ်လေး ကစ်ရေ! ထာဝရ ချစ်သွားပါမယ် ❤️💍");
+            if (!isPlaying) playSong();
+        }
+
+        // Background Particles Canvas (Floating Hearts)
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const hearts = [];
+        for (let i = 0; i < 25; i++) {
+            hearts.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 12 + 8,
+                speedY: Math.random() * 1 + 0.5,
+                opacity: Math.random() * 0.5 + 0.3
+            });
+        }
+
+        function drawHeart(x, y, size, opacity, color) {
+            ctx.save();
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = color || '#f472b6';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.bezierCurveTo(x - size / 2, y - size / 2, x - size, y + size / 3, x, y + size);
+            ctx.bezierCurveTo(x + size, y + size / 3, x + size / 2, y - size / 2, x, y);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            hearts.forEach(h => {
+                h.y -= h.speedY;
+                if (h.y < -20) {
+                    h.y = height + 20;
+                    h.x = Math.random() * width;
+                }
+                drawHeart(h.x, h.y, h.size, h.opacity);
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
